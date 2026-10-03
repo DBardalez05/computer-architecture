@@ -1,0 +1,9 @@
+iceBlinkPico-main/
+
+MP2/*.asc
+MP2/*.bin
+MP2/*.json
+MP2/*.vcd
+MP2/*.vvp
+
+MP2/mp2pwmcolors.png
