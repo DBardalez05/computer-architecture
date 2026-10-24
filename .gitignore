@@ -7,3 +7,9 @@ MP2/*.vcd
 MP2/*.vvp
 
 MP2/mp2pwmcolors.png
+
+*.vvp
+*.vcd
+*.asc
+*.bin
+/MP*/mp*.json
