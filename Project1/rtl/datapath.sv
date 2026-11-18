@@ -1,3 +1,8 @@
+// Datapath for our multicycle RV32I CPU (Murray)
+//
+// Register file, immediate generator, ALU, branch comparator and the
+// writeback mux. The control unit tells it what to do every cycle.
+
 module datapath (
     input logic     clk,
 
@@ -35,6 +40,8 @@ module datapath (
     logic [31:0] alu_result;
     logic [31:0] write_data;
 
+    // ALU result saved in EXECUTE; used later as the memory address,
+    // the jump/branch target, or the value written back to rd
     logic [31:0] alu_out_reg = 32'd0;
 
     assign rs1 = instruction[19:15];
@@ -58,6 +65,7 @@ module datapath (
         .imm            (imm)
     );
 
+    // ALU input A: rs1, PC, or zero (for lui)
     always_comb begin
         case (alu_a_sel)
             2'b00: alu_a = rs1_value;
@@ -67,6 +75,7 @@ module datapath (
         endcase
     end
 
+    // ALU input B: rs2 or the immediate
     assign alu_b = alu_b_sel ? imm : rs2_value;
 
     alu alu1 (
@@ -83,10 +92,12 @@ module datapath (
 
     assign alu_out = alu_out_reg;
 
+    // Branch comparator (separate from the ALU, which computes PC + offset)
     assign rs1_eq_rs2 = (rs1_value == rs2_value);
     assign rs1_lt_signed = ($signed(rs1_value) < $signed(rs2_value));
     assign rs1_lt_unsigned = (rs1_value < rs2_value);
 
+    // What gets written to rd: ALU result, loaded data, or PC + 4 (jal/jalr)
     always_comb begin
         case (wb_sel)
             2'b00: write_data = alu_out_reg;
@@ -113,6 +124,7 @@ module register_file (
 
     logic [31:0] regs [0:31];
 
+    // Start every register at 0 (our "reset")
     int i;
 
     initial begin
@@ -121,6 +133,7 @@ module register_file (
         end
     end
 
+    // x0 always reads as 0 and is never written
     assign rs1_value = (rs1 == 5'd0) ? 32'd0 : regs[rs1];
     assign rs2_value = (rs2 == 5'd0) ? 32'd0 : regs[rs2];
 
@@ -139,20 +152,20 @@ module alu (
 
     logic [4:0] shamt;
 
-    assign shamt = b[4:0];
+    assign shamt = b[4:0];      // shifts only use the low 5 bits
 
     always_comb begin
         case (alu_op)
-            4'b0000: result = a + b;
-            4'b0001: result = a - b;
-            4'b0010: result = a & b;
-            4'b0011: result = a | b;
-            4'b0100: result = a ^ b;
-            4'b0101: result = a << shamt;
-            4'b0110: result = a >> shamt;
-            4'b0111: result = $signed(a) >>> shamt;
-            4'b1000: result = ($signed(a) < $signed(b)) ? 32'd1 : 32'd0;
-            4'b1001: result = (a < b) ? 32'd1 : 32'd0;
+            4'b0000: result = a + b;                                        // add
+            4'b0001: result = a - b;                                        // sub
+            4'b0010: result = a & b;                                        // and
+            4'b0011: result = a | b;                                        // or
+            4'b0100: result = a ^ b;                                        // xor
+            4'b0101: result = a << shamt;                                   // sll
+            4'b0110: result = a >> shamt;                                   // srl
+            4'b0111: result = $signed(a) >>> shamt;                         // sra
+            4'b1000: result = ($signed(a) < $signed(b)) ? 32'd1 : 32'd0;    // slt
+            4'b1001: result = (a < b) ? 32'd1 : 32'd0;                      // sltu
             default: result = 32'd0;
         endcase
     end

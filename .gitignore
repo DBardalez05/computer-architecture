@@ -13,3 +13,5 @@ MP2/mp2pwmcolors.png
 *.asc
 *.bin
 /MP*/mp*.json
+.DS_Store
+Project1/build/
