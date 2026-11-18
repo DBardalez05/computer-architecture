@@ -8,7 +8,7 @@ module program_counter_tb;
     logic [31:0] next_pc;
     logic [31:0] pc;
 
-    // For this testbench we must not generate a clock
+    // For this testbench we must generate a clock
     // First tart the clock at 0
     initial clk = 1'b0;
 
