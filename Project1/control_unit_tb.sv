@@ -11,6 +11,7 @@ module control_unit_tb;
     logic reg_write_enable;
     logic ir_write_enable;
     logic pc_write_enable;
+    logic alu_out_write_enable;
 
     // Simulation the clock
     initial clk = 1'b0;
@@ -23,7 +24,8 @@ module control_unit_tb;
         .opcode(opcode),
         .reg_write_enable(reg_write_enable),
         .ir_write_enable(ir_write_enable),
-        .pc_write_enable(pc_write_enable)
+        .pc_write_enable(pc_write_enable),
+        .alu_out_write_enable(alu_out_write_enable)
     );
 
     initial begin
@@ -34,8 +36,8 @@ module control_unit_tb;
         @(posedge clk);
         #1;
 
-        $display("FETCH: reg=%b, ir=%b, pc=%b",
-                reg_write_enable, ir_write_enable, pc_write_enable);
+        $display("FETCH: reg=%b, ir=%b, pc=%b, alu_out=%b",
+                reg_write_enable, ir_write_enable, pc_write_enable, alu_out_write_enable);
 
         // Test 2 is when we move to FETCH_LATCH
         reset = 1'b0;
@@ -43,32 +45,32 @@ module control_unit_tb;
         @(posedge clk);
         #1;
 
-        $display("FETCH_LATCH: reg=%b, ir=%b, pc=%b",
-                reg_write_enable, ir_write_enable, pc_write_enable);
+        $display("FETCH_LATCH: reg=%b, ir=%b, pc=%b, alu_out=%b",
+                reg_write_enable, ir_write_enable, pc_write_enable, alu_out_write_enable);
 
         // Test 3 is when we move to DECODE
         @(posedge clk);
         #1;
-        $display("DECODE: reg=%b, ir=%b, pc=%b",
-                reg_write_enable, ir_write_enable, pc_write_enable);
+        $display("DECODE: reg=%b, ir=%b, pc=%b, alu_out=%b",
+                reg_write_enable, ir_write_enable, pc_write_enable, alu_out_write_enable);
 
         // Test 4 is moving to EXECUTE
         @(posedge clk);
         #1;
-        $display("EXECUTE: reg=%b, ir=%b, pc=%b",
-                reg_write_enable, ir_write_enable, pc_write_enable);
+        $display("EXECUTE: reg=%b, ir=%b, pc=%b, alu_out=%b",
+                reg_write_enable, ir_write_enable, pc_write_enable, alu_out_write_enable);
 
         // Test 5 is moving to WRITEBACK
         @(posedge clk);
         #1;
-        $display("WRITEBACK: reg=%b, ir=%b, pc=%b",
-                reg_write_enable, ir_write_enable, pc_write_enable);
+        $display("WRITEBACK: reg=%b, ir=%b, pc=%b, alu_out=%b",
+                reg_write_enable, ir_write_enable, pc_write_enable, alu_out_write_enable);
 
         // Test 6 is returning to FETCH
         @(posedge clk);
         #1;
-        $display("FETCH AGAIN: reg=%b, ir=%b, pc=%b",
-                reg_write_enable, ir_write_enable, pc_write_enable);
+        $display("FETCH AGAIN: reg=%b, ir=%b, pc=%b, alu_out=%b",
+                reg_write_enable, ir_write_enable, pc_write_enable, alu_out_write_enable);
 
         $finish;
     end

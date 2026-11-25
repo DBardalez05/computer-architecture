@@ -4,7 +4,8 @@ module control_unit (
     input logic [6:0] opcode,
     output logic reg_write_enable,
     output logic ir_write_enable,
-    output logic pc_write_enable
+    output logic pc_write_enable,
+    output logic alu_out_write_enable
 );
     // All the different states that state_t can be
     typedef enum logic [2:0] {
@@ -46,4 +47,6 @@ module control_unit (
     assign ir_write_enable = (state == FETCH_LATCH);
     // Then we will only update the pc once the current instruction is finished
     assign pc_write_enable = (state == WRITEBACK);
+    // Here we save teh result of the ALU calculation during the execute state  
+    assign alu_out_write_enable = (state == EXECUTE);
 endmodule
